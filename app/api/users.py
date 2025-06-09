@@ -20,6 +20,8 @@ def create_user(
     """
         Debes usar id_rol que exista por ahora tenemos 1 superadmin, 2 admin y 3 instructor
     """
+    print(current_user.correo)
+    print(current_user.id_rol)
     if current_user.id_rol == 2:
         if user.id_rol == 1 or user.id_rol == 2:
             raise HTTPException(status_code=401, detail="Usuario no autorizado")
