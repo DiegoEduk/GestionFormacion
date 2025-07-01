@@ -98,9 +98,10 @@ def modify_status_user(db: Session, user_id: int):
 def get_users_by_centro(db: Session, cod_centro: int):
     try:
         query = text("""
-            SELECT id_usuario, nombre_completo, identificacion, id_rol,
-                   correo, tipo_contrato, telefono, estado, cod_centro
+            SELECT usuario.id_usuario, usuario.nombre_completo, usuario.identificacion, usuario.id_rol,
+                   usuario.correo, usuario.tipo_contrato, usuario.telefono, usuario.estado, usuario.cod_centro, rol.nombre AS nombre_rol
             FROM usuario
+            INNER JOIN rol ON usuario.id_rol = rol.id_rol
             WHERE cod_centro = :cod_centro
         """)
         result = db.execute(query, {"cod_centro": cod_centro}).mappings().all()

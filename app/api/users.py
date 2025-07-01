@@ -3,7 +3,7 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from core.database import get_db
-from app.schemas.users import UserCreate, UserOut, UserUpdate
+from app.schemas.users import UserCreate, UserOut, UserOutRol, UserUpdate
 from app.crud import users as crud_users
 from sqlalchemy.exc import SQLAlchemyError
 from core.dependencies import get_current_user
@@ -41,7 +41,11 @@ def create_user(
     
 
 @router.get("/get-by-email", response_model=UserOut)
-def get_user(email: str, db: Session = Depends(get_db)):
+def get_user(
+    email: str,
+    db: Session = Depends(get_db),
+    current_user: UserOut = Depends(get_current_user)
+):
     try:
         user = crud_users.get_user_by_email(db, email)
         if not user:
@@ -51,7 +55,11 @@ def get_user(email: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/get-by-id", response_model=UserOut)
-def get_user_by_id(id_usuario: int, db: Session = Depends(get_db)):
+def get_user_by_id(
+    id_usuario: int,
+    db: Session = Depends(get_db),
+    current_user: UserOut = Depends(get_current_user)
+):
     try:
         user = crud_users.get_user_by_id(db, id_usuario)
         if not user:
@@ -104,7 +112,7 @@ def modify_status(user_id: int, db: Session = Depends(get_db)):
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/get-by-centro", response_model=List[UserOut])
+@router.get("/get-by-centro", response_model=List[UserOutRol])
 def get_users_by_centro(
     cod_centro: int,
     db: Session = Depends(get_db),

@@ -8,6 +8,8 @@ CREATE TABLE regional(
     nombre VARCHAR(80)
 );
 
+INSERT INTO regional(cod_regional,nombre) VALUES (66, 'REGIONAL RISARALDA');
+
 CREATE TABLE centro_formacion(
     cod_centro INT UNSIGNED PRIMARY KEY,
     nombre_centro VARCHAR(80),
@@ -15,12 +17,15 @@ CREATE TABLE centro_formacion(
     FOREIGN KEY (cod_regional) REFERENCES regional(cod_regional)
 );
 
+INSERT INTO centro_formacion(cod_centro, nombre_centro, cod_regional)
+VALUES (9121, 'CENTRO ATENCION SECTOR AGROPECUARIO', 66);
+
 ALTER TABLE programa_formacion MODIFY COLUMN nombre VARCHAR(130);
 
 CREATE TABLE programa_formacion(
     cod_programa INT UNSIGNED,
     la_version TINYINT UNSIGNED,
-    nombre VARCHAR(30),
+    nombre VARCHAR(130),
     horas_lectivas INT,
     horas_productivas INT,
     PRIMARY KEY (cod_programa, la_version)
@@ -28,13 +33,13 @@ CREATE TABLE programa_formacion(
 
 CREATE TABLE competencia(
     cod_competencia INT UNSIGNED PRIMARY KEY,
-    nombre VARCHAR(60),
+    nombre VARCHAR(160),
     horas INT UNSIGNED
 );
 
 CREATE TABLE resultado_aprendizaje(
     cod_resultado INT UNSIGNED PRIMARY KEY,
-    nombre  VARCHAR(30),
+    nombre  VARCHAR(180),
     cod_competencia INT UNSIGNED,
     FOREIGN KEY (cod_competencia) REFERENCES competencia(cod_competencia)
 );
@@ -66,10 +71,11 @@ CREATE TABLE grupo(
     nombre_programa_especial VARCHAR(60),
     hora_inicio TIME,
     hora_fin TIME,
-    aula_actual CHAR(20),
+    id_ambiente INT UNSIGNED,
     PRIMARY KEY (cod_ficha),
     FOREIGN KEY(cod_centro) REFERENCES centro_formacion(cod_centro),
-    FOREIGN KEY (cod_programa, la_version) REFERENCES programa_formacion(cod_programa, la_version)
+    FOREIGN KEY (cod_programa, la_version) REFERENCES programa_formacion(cod_programa, la_version),
+    FOREIGN KEY(id_ambiente) REFERENCES ambiente_formacion(id_ambiente)
 );
 
 CREATE TABLE datos_grupo(
@@ -98,6 +104,7 @@ CREATE TABLE datos_grupo(
 );
 
 
+
 CREATE TABLE rol(
     id_rol INT UNSIGNED PRIMARY KEY,
     nombre VARCHAR(30)
@@ -124,6 +131,15 @@ CREATE TABLE usuario(
     FOREIGN KEY(cod_centro) REFERENCES centro_formacion(cod_centro)
 );
 
+
+CREATE TABLE grupo_instructor(
+    cod_ficha INT UNSIGNED,
+    id_instructor INT UNSIGNED,
+    PRIMARY KEY (cod_ficha, id_instructor),
+    FOREIGN KEY(cod_ficha) REFERENCES grupo(cod_ficha),
+    FOREIGN KEY(id_instructor) REFERENCES usuario(id_usuario)
+);
+
 CREATE TABLE programacion(
     id_programacion INT UNSIGNED AUTO_INCREMENT,
     id_instructor INT UNSIGNED,
@@ -146,10 +162,23 @@ CREATE TABLE programacion(
 CREATE TABLE metas(
     id_meta INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     anio YEAR,
+    cod_centro INT UNSIGNED,
     concepto VARCHAR(100),
-    valor INT UNSIGNED
+    valor INT UNSIGNED,
+    FOREIGN KEY(cod_centro) REFERENCES centro_formacion(cod_centro)
 );
 
 CREATE TABLE festivos(
     festivo DATE PRIMARY KEY
+);
+
+CREATE TABLE ambiente_formacion(
+    id_ambiente INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre_ambiente VARCHAR(40),
+    num_max_aprendices TINYINT UNSIGNED,
+    municipio VARCHAR(40),
+    ubicacion VARCHAR(80),
+    cod_centro INT UNSIGNED,
+    estado BOOLEAN, -- True Activo   False Inactivo
+    FOREIGN KEY(cod_centro) REFERENCES centro_formacion(cod_centro)
 );
