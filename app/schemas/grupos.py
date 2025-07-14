@@ -10,3 +10,7 @@ class getGruposFiltros(BaseModel):
 class nivelTotalGrupos(BaseModel):
     nombre_nivel: str
     total: int
+
+class totalGrupoMes(BaseModel):
+    total: int
+    mes: int

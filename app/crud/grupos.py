@@ -24,3 +24,20 @@ def get_nivel_total_grupos_by_centro(db: Session, estado: str, modalidad: str, c
     except SQLAlchemyError as e:
         logger.error(f"Error al obtener nivel y total grupos por cod_centro: {e}")
         raise Exception("Error de base de datos al obtener nivel y total grupos")
+
+
+def get_total_grupos_finalizan_por_mes(db: Session, anio: int, cod_centro: int):
+    try:
+
+        query = text("""
+            SELECT count(cod_ficha) as total, MONTH(fecha_fin) as mes 
+                FROM grupo 
+            WHERE year(fecha_fin) = :anio AND cod_centro = :cod_centro
+            group by month(fecha_fin) order by month(fecha_fin) asc
+        """)
+        result = db.execute(query, {"anio":anio, "cod_centro":cod_centro }).mappings().all()
+        print(result)
+        return result
+    except SQLAlchemyError as e:
+        logger.error(f"Error al obtener total grupos que finalizan por mes: {e}")
+        raise Exception("Error de base de datos al obtener total grupos que finalizan por mes")
